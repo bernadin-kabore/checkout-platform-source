@@ -24,6 +24,11 @@ gitopsRepository: checkout-platform-gitops
 # image cannot reach them merely by existing in ECR.
 autoDeployEnvironment: dev
 
+# Note for anyone editing this file: it is listed in sharedPaths below, so any
+# change here -- including a comment -- rebuilds every service in the
+# application. That is deliberate (nothing in this file can be attributed to
+# one service), but it means documentation edits are not free.
+
 # A change to any of these rebuilds every service, because nothing here can be
 # attributed to one of them. Correctness over cleverness: over-building costs a
 # runner, under-building ships a stale image while reporting success.
