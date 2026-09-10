@@ -1,0 +1,96 @@
+# The catalog model for this application.
+#
+# One System — the application — and one Component per deployable service. The
+# distinction matters because they are different things: the System is what a
+# team owns and reasons about, the Component is what actually gets built into
+# an image and rolled out.
+#
+# The annotations on each Component are not decoration. They are the only
+# authoritative answer to "where does a change to this service belong", and
+# Ask the Platform reads them rather than guessing repository names from what a
+# developer typed. Four facts, all machine-resolvable:
+#
+#   source-repo     the repository holding the code
+#   source-path     that service's directory within it
+#   gitops-repo     the repository holding the deployment state
+#   gitops-service  that service's key within it, from which the platform
+#                   derives environments/<env>/services/<key>.yaml
+#
+# If you move a service's directory, change source-path in the same commit. A
+# stale annotation does not fail loudly — it sends a correct change to the
+# wrong place.
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: checkout-platform
+  description: Demo application walking the platform golden path end to end
+  annotations:
+    github.com/project-slug: bernadin-kabore/checkout-platform-source
+    backstage.io/techdocs-ref: dir:.
+    platform.acme.io/source-repo: checkout-platform-source
+    platform.acme.io/gitops-repo: checkout-platform-gitops
+  links:
+    - url: https://github.com/bernadin-kabore/checkout-platform-gitops
+      title: Deployment state (GitOps)
+      icon: github
+spec:
+  owner: bernadin-kabore
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-platform-auth
+  description: Issues and validates session tokens for the checkout flow
+  tags:
+    - go
+  annotations:
+    github.com/project-slug: bernadin-kabore/checkout-platform-source
+    backstage.io/kubernetes-id: checkout-platform-auth
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: checkout-platform-auth-dev
+    platform.acme.io/application: checkout-platform
+    platform.acme.io/source-repo: checkout-platform-source
+    platform.acme.io/source-path: services/auth
+    platform.acme.io/gitops-repo: checkout-platform-gitops
+    platform.acme.io/gitops-service: auth
+  links:
+    - url: https://kiali.platform-demo.acme.io/console/namespaces/checkout-platform-auth-dev/services/checkout-platform-auth
+      title: Service mesh (Kiali)
+      icon: web
+spec:
+  type: service
+  lifecycle: production
+  owner: bernadin-kabore
+  system: checkout-platform
+  providesApis: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-platform-payments
+  description: Authorises and captures payments for completed checkouts
+  tags:
+    - nodejs
+  annotations:
+    github.com/project-slug: bernadin-kabore/checkout-platform-source
+    backstage.io/kubernetes-id: checkout-platform-payments
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: checkout-platform-payments-dev
+    platform.acme.io/application: checkout-platform
+    platform.acme.io/source-repo: checkout-platform-source
+    platform.acme.io/source-path: services/payments
+    platform.acme.io/gitops-repo: checkout-platform-gitops
+    platform.acme.io/gitops-service: payments
+  links:
+    - url: https://kiali.platform-demo.acme.io/console/namespaces/checkout-platform-payments-dev/services/checkout-platform-payments
+      title: Service mesh (Kiali)
+      icon: web
+spec:
+  type: service
+  lifecycle: production
+  owner: bernadin-kabore
+  system: checkout-platform
+  providesApis: []
+
