@@ -30,6 +30,9 @@ autoDeployEnvironment: dev
 sharedPaths:
   - platform.yaml
   - .github/workflows/*
+  # shared/ does not exist yet. It is listed so that the first commit to
+  # create it rebuilds every service, rather than the directory quietly
+  # becoming a source of untracked coupling between them.
   - shared/*
 
 services:
